@@ -18,7 +18,7 @@ public class Continuation<ResumeArgs, ResumeFailureArgs> {
     var haveRun: UnsafeAtomic<Bool> = .create(false)
 
     @inlinable
-    public convenience init(onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void) {
+    public convenience init(onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void) where ResumeFailureArgs == Never {
         self.init(onResume: resumeFunction, onFailure: { _ in })
     }
 
