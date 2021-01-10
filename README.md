@@ -34,6 +34,8 @@ Less lets you do more to clean up state rather than enter a failure state.
 If you don't even want to keep track of it you can use one of the 2 variations that is guaranteed to execute with the provided default arguments like in the example below.
 
 ```swift
+import Continuations
+
 // Some operation that need to suspend
 let continuation = GuaranteeFailureContinuation<Data, Void>(defaultResumeFailureArgs: ()) { data in
     // Process data and continue running the operation
@@ -45,7 +47,11 @@ delegate.requestData(with: continuation)
 
 // In the delegate
 func requestData(with continuation: Continuation<Data, Void>) {
-    continuation.resumeFailure()
+    guard someCondition {
+        continuation.resumeFailure()
+        return
+    }
+    continuation.resume(args: self.someData)
 }
 ```
 
