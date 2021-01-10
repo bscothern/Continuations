@@ -21,7 +21,7 @@ final class GuaranteeFailureContinuationTests: XCTestCase {
         XCTAssertFalse(c.haveRun.load(ordering: .relaxed))
         done = true
     }
-    
+
     func testAutoResumeFailure1() {
         var value = 0
         let expected = 42
@@ -35,7 +35,7 @@ final class GuaranteeFailureContinuationTests: XCTestCase {
         }
         XCTAssertEqual(value, expected)
     }
-    
+
     func testResumeFailure1() {
         var value = 0
         let expected = 42
@@ -50,7 +50,7 @@ final class GuaranteeFailureContinuationTests: XCTestCase {
         }
         XCTAssertEqual(value, expected)
     }
-    
+
     func testResume1() {
         var value = 0
         let expected = 0

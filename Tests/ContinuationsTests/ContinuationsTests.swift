@@ -12,7 +12,7 @@ final class ContinuationsTests: XCTestCase {
         }
         XCTAssertFalse(c.haveRun.load(ordering: .relaxed))
     }
-    
+
     func testResume1() {
         var wasRun = false
         let c = Continuation<Void, Void> {
@@ -25,7 +25,7 @@ final class ContinuationsTests: XCTestCase {
         XCTAssertTrue(c.haveRun.load(ordering: .relaxed))
         XCTAssertTrue(wasRun)
     }
-    
+
     func testResume2() {
         var value: Int = 0
         let expected = 42
@@ -39,7 +39,7 @@ final class ContinuationsTests: XCTestCase {
         XCTAssertTrue(c.haveRun.load(ordering: .relaxed))
         XCTAssertEqual(value, expected)
     }
-    
+
     func testMultipleResume() {
         var runCount = 0
         let c = Continuation<Void, Void> {
@@ -54,7 +54,7 @@ final class ContinuationsTests: XCTestCase {
         c.resume()
         XCTAssertEqual(runCount, 1)
     }
-    
+
     func testMultipleResumeConcurrent() {
         var runCount = 0
         let c = Continuation<Void, Void> {
@@ -69,7 +69,7 @@ final class ContinuationsTests: XCTestCase {
             XCTAssertEqual(runCount, 1)
         }
     }
-    
+
     func testResumeFailure1() {
         var wasRun = false
         let c = Continuation<Void, Void> {
@@ -96,7 +96,7 @@ final class ContinuationsTests: XCTestCase {
         XCTAssertTrue(c.haveRun.load(ordering: .relaxed))
         XCTAssertEqual(value, expected)
     }
-    
+
     func testMultipleResumeFailure() {
         var runCount = 0
         let c = Continuation<Void, Void> {
@@ -111,7 +111,7 @@ final class ContinuationsTests: XCTestCase {
         c.resumeFailure()
         XCTAssertEqual(runCount, 1)
     }
-    
+
     func testMultipleResumeFailureConcurrent() {
         var runCount = 0
         let c = Continuation<Void, Void> {

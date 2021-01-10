@@ -22,7 +22,7 @@ public class Continuation<ResumeArgs, ResumeFailureArgs> {
 
     @usableFromInline
     var haveRun: UnsafeAtomic<Bool> = .create(false)
-    
+
     /// Creates a `Continuation`.
     /// 
     /// - Parameters:
@@ -42,7 +42,7 @@ public class Continuation<ResumeArgs, ResumeFailureArgs> {
     deinit {
         haveRun.destroy()
     }
-    
+
     /// Has the `Continuation` resume its operation in a successful manner.
     ///
     /// - Parameter args: The arguments to pass to this continuations resume function.
