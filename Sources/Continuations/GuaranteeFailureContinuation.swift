@@ -3,7 +3,7 @@
 //  Continuations
 //
 //  Created by Braden Scothern on 10/20/20.
-//  Copyright © 2020 Braden Scothern. All rights reserved.
+//  Copyright © 2020-2021 Braden Scothern. All rights reserved.
 //
 
 import Atomics
@@ -13,18 +13,19 @@ public final class GuaranteeFailureContinuation<ResumeArgs, ResumeFailureArgs>: 
     @usableFromInline
     let defaultResumeFailureArgs: () -> ResumeFailureArgs
 
+    /// Creates a `GuaranteeFailureContinuation`.
+    /// 
+    /// - Parameters:
+    ///   - defaultResumeFailureArgs: An autoclosure that will be executed to supply arguments to `resumeFailure(args:)` on deinit if the continuation has not already been resumed.
+    ///   - resumeFunction: The function that will be called when `resume(args:)` is called.
+    ///   - resumeFailureFunction: The function that will be called when `resumeFailure(args:)` is called.
+    ///   - args: The arguments to the resume function being executed.
     @inlinable
-    public convenience init(defaultResumeFailureArgs: @escaping @autoclosure () -> ResumeFailureArgs, onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void) {
-        self.init(defaultResumeFailureArgs: defaultResumeFailureArgs, onResume: resumeFunction, onFailure: { _ in })
-    }
-
-    @inlinable
-    public convenience init(defaultResumeFailureArgs: @escaping @autoclosure () -> ResumeFailureArgs, onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void, onFailure resumeFailureFunction: @escaping (_ args: ResumeFailureArgs) -> Void) {
-        self.init(defaultResumeFailureArgs: defaultResumeFailureArgs, onResume: resumeFunction, onFailure: resumeFailureFunction)
-    }
-
-    @usableFromInline
-    init(defaultResumeFailureArgs: @escaping () -> ResumeFailureArgs, onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void, onFailure resumeFailureFunction: @escaping (_ args: ResumeFailureArgs) -> Void) {
+    public init(
+        defaultResumeFailureArgs: @escaping @autoclosure () -> ResumeFailureArgs,
+        onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void,
+        onFailure resumeFailureFunction: @escaping (_ args: ResumeFailureArgs) -> Void
+    ) {
         self.defaultResumeFailureArgs = defaultResumeFailureArgs
         super.init(onResume: resumeFunction, onFailure: resumeFailureFunction)
     }

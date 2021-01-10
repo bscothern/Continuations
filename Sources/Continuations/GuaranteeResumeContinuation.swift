@@ -3,7 +3,7 @@
 //  Continuations
 //
 //  Created by Braden Scothern on 10/20/20.
-//  Copyright © 2020 Braden Scothern. All rights reserved.
+//  Copyright © 2020-2021 Braden Scothern. All rights reserved.
 //
 
 import Atomics
@@ -13,18 +13,19 @@ public final class GuaranteeResumeContinuation<ResumeArgs, ResumeFailureArgs>: C
     @usableFromInline
     let defaultResumeArgs: () -> ResumeArgs
 
+    /// Creates a `GuaranteeResumeContinuation`.
+    ///
+    /// - Parameters:
+    ///   - defaultResumeArgs: An autoclosure that will be executed to supply arguments to `resume(args:)` on deinit if the continuation has not already been resumed.
+    ///   - resumeFunction: The function that will be called when `resume(args:)` is called.
+    ///   - resumeFailureFunction: The function that will be called when `resumeFailure(args:)` is called.
+    ///   - args: The arguments to the resume function being executed.
     @inlinable
-    public convenience init(defaultResumeArgs: @escaping @autoclosure () -> ResumeArgs, onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void) {
-        self.init(defaultResumeArgs: defaultResumeArgs, onResume: resumeFunction, onFailure: { _ in })
-    }
-
-    @inlinable
-    public convenience init(defaultResumeArgs: @escaping @autoclosure () -> ResumeArgs, onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void, onFailure resumeFailureFunction: @escaping (_ args: ResumeFailureArgs) -> Void) {
-        self.init(defaultResumeArgs: defaultResumeArgs, onResume: resumeFunction, onFailure: resumeFailureFunction)
-    }
-
-    @usableFromInline
-    init(defaultResumeArgs: @escaping () -> ResumeArgs, onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void, onFailure resumeFailureFunction: @escaping (_ args: ResumeFailureArgs) -> Void) {
+    public init(
+        defaultResumeArgs: @escaping @autoclosure () -> ResumeArgs,
+        onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void,
+        onFailure resumeFailureFunction: @escaping (_ args: ResumeFailureArgs) -> Void
+    ) {
         self.defaultResumeArgs = defaultResumeArgs
         super.init(onResume: resumeFunction, onFailure: resumeFailureFunction)
     }
