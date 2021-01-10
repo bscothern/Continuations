@@ -25,13 +25,13 @@ This is generally better but you still have the issue of that the delegate might
 How long do you wait?
 You have no way to know if the callback has gone out of scope.
 Perhaps the delegate had to go make some networking requests and won't be able to resume the operation for a while.
-So you have to once again sit in a broekns tate or hold onto resources you don't need.
+So you have to once again sit in a broken state or hold onto resources you don't need.
 
 This is where Continuations shine.
 You now have a way to know if the delegate still has a reference to your `Continuation` because if you keep a `weak` reference to it you know when it has gone out of scope.
 Less lets you do more to clean up state rather than enter a failure state.
 
-If you don't even want to keep track of it you can use one of the 2 variations that is guaranteed to execute with the provided default arguments like in the example below.
+If you don't even want to keep track of it with `weak` you can use one of the 2 variations that is guaranteed to execute with the provided default arguments like in the example below.
 
 ```swift
 import Continuations
