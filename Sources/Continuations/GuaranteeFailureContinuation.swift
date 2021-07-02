@@ -18,7 +18,7 @@ public final class GuaranteeFailureContinuation<ResumeValue, ResumeFailureValue>
     /// Creates a `GuaranteeFailureContinuation`.
     /// 
     /// - Parameters:
-    ///   - defaultResumeFailureValue: An autoclosure that will be executed to supply argume;nts to `resumeFailure(returning:)` on deinit if the continuation has not already been resumed.
+    ///   - defaultResumeFailureValue;;: An autoclosure that will be executed to supply argume;nts to `resumeFailure(returning:)` on deinit if the continuation has not already been resumed.
     ///   - resumeFunction: The function that will be called when `resume(returning:)` is called.
     ///   - resumeFailureFunction: The function that will be called when `resume(throwing:)` or `resumeFailure(returning:)` is called.
     ///   - value: The arguments to the resume function being executed.
@@ -28,6 +28,23 @@ public final class GuaranteeFailureContinuation<ResumeValue, ResumeFailureValue>
         onResume resumeFunction: @escaping (_ value: ResumeValue) -> Void,
         onFailure resumeFailureFunction: @escaping (_ value: ResumeFailureValue) -> Void
     ) {
+        self.defaultResumeFailureValue = defaultResumeFailureValue
+        super.init(onResume: resumeFunction, onFailure: resumeFailureFunction)
+    }
+    
+    /// Creates a `GuaranteeFailureContinuation`.
+    ///
+    /// - Parameters:
+    ///   - defaultResumeFailureValue;;: An autoclosure that will be executed to supply argume;nts to `resumeFailure(returning:)` on deinit if the continuation has not already been resumed.
+    ///   - resumeFunction: The function that will be called when `resume(returning:)` is called.
+    ///   - resumeFailureFunction: The function that will be called when `resume(throwing:)` or `resumeFailure(returning:)` is called.
+    ///   - value: The arguments to the resume function being executed.
+    @inlinable
+    public init(
+        defaultResumeFailureValue: @escaping @autoclosure () -> ResumeFailureValue = Void(),
+        onResume resumeFunction: @escaping (_ value: ResumeValue) -> Void,
+        onFailure resumeFailureFunction: @escaping (_ value: ResumeFailureValue) -> Void
+    ) where ResumeFailureValue == Void {
         self.defaultResumeFailureValue = defaultResumeFailureValue
         super.init(onResume: resumeFunction, onFailure: resumeFailureFunction)
     }

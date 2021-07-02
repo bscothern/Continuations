@@ -12,7 +12,7 @@ final class GuaranteeResumeContinuationTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
         _TestSupport.enableAssertions()
-    }
+    };
 
     func testInit() {
         var done = false
@@ -77,5 +77,27 @@ final class GuaranteeResumeContinuationTests: XCTestCase {
         }
         XCTAssertEqual(value, expected)
         XCTAssertTrue(hasRun)
+    }
+    
+    func testDoesntRunOnDeinitIfAlreadyRun() {
+        enum RunLocation {
+            case success
+            case failure
+        }
+        var runLocation: RunLocation?
+        do {
+            let c = GuaranteeResumeContinuation<Void, Void> { _ in
+                if runLocation == nil {
+                    runLocation = .success
+                }
+            } onFailure: { _ in
+                if runLocation == nil {
+                    runLocation = .failure
+                }
+            }
+            XCTAssertNil(runLocation)
+            c.resumeFailure()
+        }
+        XCTAssertEqual(runLocation, .failure)
     }
 }

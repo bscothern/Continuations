@@ -31,10 +31,27 @@ public final class GuaranteeResumeContinuation<ResumeValue, ResumeFailureValue>:
         self.defaultResumeValue = defaultResumeValue
         super.init(onResume: resumeFunction, onFailure: resumeFailureFunction)
     }
+    
+    /// Creates a `GuaranteeResumeContinuation`.
+    ///
+    /// - Parameters:
+    ///   - defaultResumeValue: An autoclosure that will be executed to supply arguments to `resume(returning:)` on deinit if the continuation has not already been resumed.
+    ///   - resumeFunction: The function that will be called when `resume(returning:)` is called.
+    ///   - resumeFailureFunction: The function that will be called when `resume(throwing:)` or `resumeFailure(returning:)` is called.
+    ///   - value: The arguments to the resume function being executed.
+    @inlinable
+    public init(
+        defaultResumeValue: @escaping @autoclosure () -> ResumeValue = Void(),
+        onResume resumeFunction: @escaping (_ value: ResumeValue) -> Void,
+        onFailure resumeFailureFunction: @escaping (_ value: ResumeFailureValue) -> Void
+    ) where ResumeValue == Void {
+        self.defaultResumeValue = defaultResumeValue
+        super.init(onResume: resumeFunction, onFailure: resumeFailureFunction)
+    }
 
     @inlinable
     deinit {
         guard !haveRun.load(ordering: .relaxed) else { return }
         resume(returning: defaultResumeValue())
-    }
+    };
 }
