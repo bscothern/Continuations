@@ -4,7 +4,7 @@ A simple library for efficient [continuations](https://en.wikipedia.org/wiki/Con
 
 ![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg)
 ![SwiftPM](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)
-![Swift Versions](https://img.shields.io/badge/Swift-5.3-orange.svg)
+![Swift Versions](https://img.shields.io/badge/Swift-5.3+-orange.svg)
 
 Continuations are an alternative to traditional callbacks to help with asynchronous operations.
 As provided in this library they are resumed with whatever arguments they require and you know if it was a success or failure right away.
