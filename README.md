@@ -94,7 +94,7 @@ Then in the targets section add this line as a dependency in your `Package.swift
 .product(name: "Continuations", package: "Continuations"),
 ```
 
-It is recommended to use `.upToNextMinor(from: "0.1.0")` for the version number because this project will be source stable between minor versions until version `1.0.0` is reached.
+It is recommended to use `.upToNextMinor(from: "0.2.0")` for the version number because this project will be source stable between minor versions until version `1.0.0` is reached.
 While it is small and simple it is not currently marked as `1.0.0` because it depends on Apple's Swift-Atomics package which isn't considered stable.
 It also follows the pattern of being stable between minor versions.
 This project currently uses `.upToNextMinor(from: "0.0.3")` for that dependency.
