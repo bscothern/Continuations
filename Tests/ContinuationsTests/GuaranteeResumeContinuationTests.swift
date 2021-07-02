@@ -4,10 +4,20 @@ import Foundation
 import XCTest
 
 final class GuaranteeResumeContinuationTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        _TestSupport.disableAssertions()
+    }
+
+    override func tearDown() {
+        super.tearDown()
+        _TestSupport.enableAssertions()
+    }
+
     func testInit() {
         var done = false
         let c = GuaranteeResumeContinuation<Void, Void>(
-            defaultResumeArgs: { () -> Void in
+            defaultResumeValue: { () -> Void in
                 if !done {
                     XCTFail("Inits shouldn't call default arguments")
                 }
@@ -26,7 +36,7 @@ final class GuaranteeResumeContinuationTests: XCTestCase {
         var value = 0
         let expected = 42
         do {
-            let c = GuaranteeResumeContinuation<Int, Void>(defaultResumeArgs: expected) {
+            let c = GuaranteeResumeContinuation<Int, Void>(defaultResumeValue: expected) {
                 value = $0
             } onFailure: {
                 XCTFail("Resume failure function shouldn't be called")
@@ -40,13 +50,13 @@ final class GuaranteeResumeContinuationTests: XCTestCase {
         var value = 0
         let expected = 42
         do {
-            let c = GuaranteeResumeContinuation<Int, Void>(defaultResumeArgs: -expected) {
+            let c = GuaranteeResumeContinuation<Int, Void>(defaultResumeValue: -expected) {
                 value = $0
             } onFailure: {
                 XCTFail("Resume failure function shouldn't be called")
             }
             XCTAssertFalse(c.haveRun.load(ordering: .relaxed))
-            c.resume(args: expected)
+            c.resume(returning: expected)
         }
         XCTAssertEqual(value, expected)
     }
@@ -54,9 +64,9 @@ final class GuaranteeResumeContinuationTests: XCTestCase {
     func testResumeFailure1() {
         var value = 0
         let expected = 0
-        var hasRun: Bool = false
+        var hasRun = false
         do {
-            let c = GuaranteeResumeContinuation<Int, Void>(defaultResumeArgs: expected + 1) {
+            let c = GuaranteeResumeContinuation<Int, Void>(defaultResumeValue: expected + 1) {
                 value = $0
             } onFailure: {
                 hasRun = true

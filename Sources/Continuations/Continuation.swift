@@ -13,67 +13,83 @@ import Atomics
 /// Unlike when a callback is executed when a continuation has its success or failure known right away.
 ///
 /// There is also the benefit of it is guaranteed in a thread safe way that a `Continuation` can only be resumed a single time.
-/// If `resume(args:)` or `resumeFailure(args:)` is called more than once or after the other resume function has been called then nothing will happen.
-public class Continuation<ResumeArgs, ResumeFailureArgs> {
-    @usableFromInline
-    let resumeFunction: (_ args: ResumeArgs) -> Void
-    @usableFromInline
-    let resumeFailureFunction: (_ failureArgs: ResumeFailureArgs) -> Void
-
+/// If `resume(returning:)` or `resumeFailure(returning:)` or `resume(throwing:)` is called more than once or after the other resume function has been called then nothing will happen in release mode and an assertion will be raised in debug mode.
+public class Continuation<ResumeValue, ResumeFailure>: UncheckedContinuation<ResumeValue, ResumeFailure> {
     @usableFromInline
     var haveRun: UnsafeAtomic<Bool> = .create(false)
-
-    /// Creates a `Continuation`.
-    /// 
-    /// - Parameters:
-    ///   - resumeFunction: The function that will be called when `resume(args:)` is called.
-    ///   - resumeFailureFunction: The function that will be called when `resumeFailure(args:)` is called.
-    ///   - args: The arguments to the resume function being executed.
-    @inlinable
-    public init(
-        onResume resumeFunction: @escaping (_ args: ResumeArgs) -> Void,
-        onFailure resumeFailureFunction: @escaping (_ args: ResumeFailureArgs) -> Void
-    ) {
-        self.resumeFunction = resumeFunction
-        self.resumeFailureFunction = resumeFailureFunction
-    }
 
     @inlinable
     deinit {
         haveRun.destroy()
     }
 
-    /// Has the `Continuation` resume its operation in a successful manner.
+    /// Has the continuation resume its operation in a successful manner.
     ///
-    /// - Parameter args: The arguments to pass to this continuations resume function.
+    /// - Parameter value: The arguments to pass to this continuations resume function.
     @inlinable
-    public func resume(args: ResumeArgs) {
-        guard !haveRun.exchange(true, ordering: .releasing) else { return }
-        resumeFunction(args)
+    public override func resume(returning value: ResumeValue) {
+        guard !haveRun.exchange(true, ordering: .releasing) else {
+            #if DEBUG
+            assert(_TestSupport.assertCondition, "A continuation should only be resumed once.")
+            #endif
+            return
+        }
+        super.resumeFunction(value)
     }
 
-    /// Has the `Continuation` resume its operation in a failed manner.
+    /// Has the continuation resume its operation in a failed manner.
     ///
-    /// - Parameter args: The arguments to pass to this continuations resume failed function.
+    /// - Parameter value: The arguments to pass to this continuations resume failed function.
     @inlinable
-    public func resumeFailure(args: ResumeFailureArgs) {
-        guard !haveRun.exchange(true, ordering: .releasing) else { return }
-        resumeFailureFunction(args)
+    @available(*, deprecated, message: "Continuations that have a ResumeFailure that conforms to Error should use the function resume(throwing:) in order to match Swift 5.5 concurrency.")
+    public override func resumeFailure(returning value: ResumeFailure) where ResumeFailure: Error {
+        guard !haveRun.exchange(true, ordering: .releasing) else {
+            #if DEBUG
+            assert(_TestSupport.assertCondition, "A continuation should only be resumed once.")
+            #endif
+            return
+        }
+        resumeFailureFunction(value)
     }
-}
 
-extension Continuation where ResumeArgs == Void {
-    /// Has the `Continuation` resume its operation in a successful manner.
-    @_transparent
-    public func resume() {
-        resume(args: ())
+    /// Has the continuation resume its operation in a failed manner.
+    ///
+    /// - Parameter value: The arguments to pass to this continuations resume failed function.
+    @inlinable
+    public override func resumeFailure(returning value: ResumeFailure) {
+        guard !haveRun.exchange(true, ordering: .releasing) else {
+            #if DEBUG
+            assert(_TestSupport.assertCondition, "A continuation should only be resumed once.")
+            #endif
+            return
+        }
+        super.resumeFailure(returning: value)
     }
-}
 
-extension Continuation where ResumeFailureArgs == Void {
-    /// Has the `Continuation` resume its operation in a failed manner.
-    @_transparent
-    public func resumeFailure() {
-        resumeFailure(args: ())
+    /// Has the continuation resume its operation in a failed manner.
+    ///
+    /// - Parameter error: The arguments to pass to this continuations resume failed function.
+    @inlinable
+    public override func resume(throwing error: ResumeFailure)
+    where ResumeFailure: Error {
+        guard !haveRun.exchange(true, ordering: .releasing) else {
+            #if DEBUG
+            assert(_TestSupport.assertCondition, "A continuation should only be resumed once.")
+            #endif
+            return
+        }
+        super.resume(throwing: error)
+    }
+
+    @inlinable
+    public override func resume(with result: Result<ResumeValue, ResumeFailure>)
+    where ResumeFailure: Error {
+        guard !haveRun.exchange(true, ordering: .releasing) else {
+            #if DEBUG
+            assert(_TestSupport.assertCondition, "A continuation should only be resumed once.")
+            #endif
+            return
+        }
+        super.resume(with: result)
     }
 }

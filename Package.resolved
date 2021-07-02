@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/apple/swift-atomics.git",
         "state": {
           "branch": null,
-          "revision": "26e346cd64f6b92d4089e7fafe2f8e82f60ddb8c",
-          "version": "0.0.2"
+          "revision": "3e95ba32cd1b4c877f6163e8eea54afc4e63bf9f",
+          "version": "0.0.3"
         }
       }
     ]

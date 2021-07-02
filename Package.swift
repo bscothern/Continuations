@@ -12,7 +12,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-atomics.git", .upToNextMinor(from: "0.0.2")),
+        .package(url: "https://github.com/apple/swift-atomics.git", .upToNextMinor(from: "0.0.3")),
     ],
     targets: [
         .target(

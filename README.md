@@ -12,6 +12,15 @@ This style takes heavy influence from Swift's `Result` type.
 
 Because continuations are particularly useful for tasks that can't do work until after receiving user input there are 2 variations that ensure they are eventually called with a default value for success or failure.
 
+## Relationship to Swift 5.5's Concurrency
+The continuation types in this library have been designed to be nearly identical in usage to both `UnsafeContinuation` and `CheckedContinuation`.
+This makes it so you things can more easily be migrated to Swift's async/await when you are able to support the minimum deployment target required for those features.
+
+The biggest difference is that Swift's continuations properly throw an error at the suspension point when things go wrong.
+Because this library can't do that since things aren't being suspended there are 2 ways to resume a failure.
+When you want to pass a non-Error type back as part of the failure then you can call `resumeFailure(returning:)`.
+When your failure input does conform to Error then you can call `resume(throwing:)` in order to minimize code changes in the future when your code moves to Swift's async/await.
+
 ## Why use continuations over other async patterns
 When working in Swift (especially for Apple platforms) we often work with delegate relationships.
 When we need to asynchronously work with a delegate things instantly get much more complex.
@@ -37,7 +46,7 @@ If you don't even want to keep track of it with `weak` you can use one of the 2 
 import Continuations
 
 // Some operation that need to suspend
-let continuation = GuaranteeFailureContinuation<Data, Void>(defaultResumeFailureArgs: ()) { data in
+let continuation = GuaranteeFailureContinuation<Data, Void>(defaultResumeFailureValue: ()) { data in
     // Process data and continue running the operation
 } onFailure: {
     // Clean up operation
@@ -51,7 +60,7 @@ func requestData(with continuation: Continuation<Data, Void>) {
         continuation.resumeFailure()
         return
     }
-    continuation.resume(args: self.someData)
+    continuation.resume(returning: self.someData)
 }
 ```
 
@@ -66,17 +75,18 @@ Continuations just makes it much easier to reason and safely write asynchronous 
 
 ## Types of continuations
 The three types provided are
-* `Continuation<ResumeArgs, ResumeFailureArgs>` - This is the most basic and simply ties together successful and failure closures so things can be resumed. 
-* `GuaranteeFailureContinuation<ResumeArgs, ResumeFailureArgs>` - This ensures that when it goes out of scope the failure case is resumed if it was not resumed before that point.
-* `GuaranteeResumeContinuation<ResumeArgs, ResumeFailureArgs>` - This ensures that when it goes out of scope that the success case is resumed if it was not resumed before that point.
+* `UncheckedContinuation<ResumeValue, ResumeFailureValue>` - This is the most basic and simply ties together successful and failure closures so things can be resumed.
+* `Continuation<ResumeValue, ResumeFailureValue>` - This ensures that a resume function is only called once and raises an assertion in debug modes if more than one is raised.
+* `GuaranteeFailureContinuation<ResumeValue, ResumeFailureValue>` - This ensures that when it goes out of scope the failure case is resumed if it was not resumed before that point.
+* `GuaranteeResumeContinuation<ResumeValue, ResumeFailureValue>` - This ensures that when it goes out of scope that the success case is resumed if it was not resumed before that point.
 
 These are all generic so you can customize the inputs to each function easily while having consistency.
-If you need to pass a more complex set of values as `ResumeArgs` or `ResumeFailureArgs` it is recommended that you use a concrete type or typealias so things can be better documented.
+If you need to pass a more complex set of values as `ResumeValue` or `ResumeFailureValue` it is recommended that you use a concrete type or typealias so things can be better documented.
 
 ## Adding `Continuations` as a dependency
 Add the following line to your package dependencies in your `Package.swift` file:
 ```swift
-.package(url: "https://github.com/bscothern/Continuations", .upToNextMinor(from: "0.1.0")),
+.package(url: "https://github.com/bscothern/Continuations", .upToNextMinor(from: "0.2.0")),
 ```
 
 Then in the targets section add this line as a dependency in your `Package.swift` file:
@@ -87,4 +97,4 @@ Then in the targets section add this line as a dependency in your `Package.swift
 It is recommended to use `.upToNextMinor(from: "0.1.0")` for the version number because this project will be source stable between minor versions until version `1.0.0` is reached.
 While it is small and simple it is not currently marked as `1.0.0` because it depends on Apple's Swift-Atomics package which isn't considered stable.
 It also follows the pattern of being stable between minor versions.
-This project currently uses `.upToNextMinor(from: "0.0.2")` for that dependency.
+This project currently uses `.upToNextMinor(from: "0.0.3")` for that dependency.
