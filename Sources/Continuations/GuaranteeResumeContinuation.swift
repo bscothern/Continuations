@@ -31,7 +31,7 @@ public final class GuaranteeResumeContinuation<ResumeValue, ResumeFailureValue>:
         self.defaultResumeValue = defaultResumeValue
         super.init(onResume: resumeFunction, onFailure: resumeFailureFunction)
     }
-    
+
     /// Creates a `GuaranteeResumeContinuation`.
     ///
     /// - Parameters:
@@ -53,5 +53,5 @@ public final class GuaranteeResumeContinuation<ResumeValue, ResumeFailureValue>:
     deinit {
         guard !haveRun.load(ordering: .relaxed) else { return }
         resume(returning: defaultResumeValue())
-    };
+    }
 }

@@ -21,7 +21,7 @@ public class Continuation<ResumeValue, ResumeFailure>: UncheckedContinuation<Res
     @inlinable
     deinit {
         haveRun.destroy()
-    };
+    }
 
     /// Has the continuation resume its operation in a successful manner.
     ///
@@ -36,7 +36,7 @@ public class Continuation<ResumeValue, ResumeFailure>: UncheckedContinuation<Res
         }
         super.resumeFunction(value)
     }
-    ;
+
     /// Has the continuation resume its operation in a failed manner.
     ///
     /// - Parameter value: The arguments to pass to this continuations resume failed function.

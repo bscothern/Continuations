@@ -31,7 +31,7 @@ public final class GuaranteeFailureContinuation<ResumeValue, ResumeFailureValue>
         self.defaultResumeFailureValue = defaultResumeFailureValue
         super.init(onResume: resumeFunction, onFailure: resumeFailureFunction)
     }
-    
+
     /// Creates a `GuaranteeFailureContinuation`.
     ///
     /// - Parameters:

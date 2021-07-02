@@ -12,7 +12,7 @@ final class GuaranteeResumeContinuationTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
         _TestSupport.enableAssertions()
-    };
+    }
 
     func testInit() {
         var done = false
@@ -78,7 +78,7 @@ final class GuaranteeResumeContinuationTests: XCTestCase {
         XCTAssertEqual(value, expected)
         XCTAssertTrue(hasRun)
     }
-    
+
     func testDoesntRunOnDeinitIfAlreadyRun() {
         enum RunLocation {
             case success
