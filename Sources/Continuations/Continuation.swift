@@ -41,21 +41,6 @@ public class Continuation<ResumeValue, ResumeFailure>: UncheckedContinuation<Res
     ///
     /// - Parameter value: The arguments to pass to this continuations resume failed function.
     @inlinable
-    @available(*, deprecated, message: "Continuations that have a ResumeFailure that conforms to Error should use the function resume(throwing:) in order to match Swift 5.5 concurrency.")
-    public override func resumeFailure(returning value: ResumeFailure) where ResumeFailure: Error {
-        guard !haveRun.exchange(true, ordering: .releasing) else {
-            #if DEBUG
-            assert(_TestSupport.assertCondition, "A continuation should only be resumed once.")
-            #endif
-            return
-        }
-        resumeFailureFunction(value)
-    }
-
-    /// Has the continuation resume its operation in a failed manner.
-    ///
-    /// - Parameter value: The arguments to pass to this continuations resume failed function.
-    @inlinable
     public override func resumeFailure(returning value: ResumeFailure) {
         guard !haveRun.exchange(true, ordering: .releasing) else {
             #if DEBUG

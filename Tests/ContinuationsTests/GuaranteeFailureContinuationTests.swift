@@ -32,12 +32,25 @@ final class GuaranteeFailureContinuationTests: XCTestCase {
         done = true
     }
 
+    func testAutoResumeFailureWithDefaultValue() {
+        var called = false
+        do {
+            let c = GuaranteeFailureContinuation<Void, Void> {
+                XCTFail("Resume function shouldn't be called")
+            } onFailure: {
+                called = true
+            }
+            XCTAssertFalse(c.haveRun.load(ordering: .relaxed))
+        }
+        XCTAssert(called)
+    }
+
     func testAutoResumeFailure1() {
         var value = 0
         let expected = 42
         do {
             let c = GuaranteeFailureContinuation<Void, Int>(defaultResumeFailureValue: expected) {
-                XCTFail("Resume failure function shouldn't be called")
+                XCTFail("Resume function shouldn't be called")
             } onFailure: {
                 value = $0
             }
@@ -89,10 +102,14 @@ final class GuaranteeFailureContinuationTests: XCTestCase {
             let c = GuaranteeFailureContinuation<Void, Void> { _ in
                 if runLocation == nil {
                     runLocation = .success
+                } else {
+                    XCTFail("Only one continuation function should be executed")
                 }
             } onFailure: { _ in
                 if runLocation == nil {
                     runLocation = .failure
+                } else {
+                    XCTFail("Only one continuation function should be executed")
                 }
             }
             XCTAssertNil(runLocation)

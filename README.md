@@ -86,15 +86,30 @@ If you need to pass a more complex set of values as `ResumeValue` or `ResumeFail
 ## Adding `Continuations` as a dependency
 Add the following line to your package dependencies in your `Package.swift` file:
 ```swift
-.package(url: "https://github.com/bscothern/Continuations", .upToNextMinor(from: "0.2.0")),
+.package(url: "https://github.com/bscothern/Continuations", .upToNextMinor(from: "0.3.0")),
 ```
 
-Then in the targets section add this line as a dependency in your `Package.swift` file:
-```swift
-.product(name: "Continuations", package: "Continuations"),
+## Continuation Structure
 ```
-
-It is recommended to use `.upToNextMinor(from: "0.2.0")` for the version number because this project will be source stable between minor versions until version `1.0.0` is reached.
-While it is small and simple it is not currently marked as `1.0.0` because it depends on Apple's Swift-Atomics package which isn't considered stable.
-It also follows the pattern of being stable between minor versions.
-This project currently uses `.upToNextMinor(from: "0.0.3")` for that dependency.
+                    ┌───────────────────────┐
+                    │                       │
+                    │ UncheckedContinuation │
+                    │                       │
+                    └───────────────────────┘
+                                ▲
+                                │
+                                │
+                        ┌───────┴──────┐
+                        │              │
+                        │ Continuation │
+                        │              │
+                        └──────────────┘
+                           ▲        ▲
+                ┌──────────┘        └───────┐
+                │                           │
+┌───────────────┴─────────────┐  ┌──────────┴───────────────────┐
+│                             │  │                              │
+│ GuaranteeResumeContinuation │  │ GuaranteeFailureContinuation │
+│                             │  │                              │
+└─────────────────────────────┘  └──────────────────────────────┘
+```

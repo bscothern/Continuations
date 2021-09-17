@@ -8,6 +8,8 @@
 
 #if DEBUG
 /// A scope for variables that helps enable testing.
+///
+/// These flags are used to disable assertions while helping ensure correct behavior for normal use.
 @usableFromInline
 enum _TestSupport {
     @usableFromInline

@@ -42,15 +42,6 @@ public class UncheckedContinuation<ResumeValue, ResumeFailure> {
     ///
     /// - Parameter value: The arguments to pass to this continuations resume failed function.
     @inlinable
-    @available(*, deprecated, message: "Continuations that have a ResumeFailure that conforms to Error should use the function resume(throwing:) in order to match Swift 5.5 concurrency.")
-    public func resumeFailure(returning value: ResumeFailure) where ResumeFailure: Error {
-        resumeFailureFunction(value)
-    }
-
-    /// Has the continuation resume its operation in a failed manner.
-    ///
-    /// - Parameter value: The arguments to pass to this continuations resume failed function.
-    @inlinable
     public func resumeFailure(returning value: ResumeFailure) {
         resumeFailureFunction(value)
     }
