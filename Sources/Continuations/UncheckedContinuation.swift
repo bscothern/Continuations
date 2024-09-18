@@ -3,17 +3,17 @@
 //  Continuations
 //
 //  Created by Braden Scothern on 7/1/21.
-//  Copyright © 2020-2021 Braden Scothern. All rights reserved.
+//  Copyright © 2020-2024 Braden Scothern. All rights reserved.
 //
 
 /// A continuation is a context that should be resumed or failed in the future to continue running some asynchronous operation.
 ///
 /// Unlike when a callback is executed when a continuation has its success or failure known right away.
-public class UncheckedContinuation<ResumeValue, ResumeFailure> {
+public class UncheckedContinuation<ResumeValue, ResumeFailure>: @unchecked Sendable {
     @usableFromInline
-    let resumeFunction: (_ value: ResumeValue) -> Void
+    let resumeFunction: @Sendable (_ value: ResumeValue) -> Void
     @usableFromInline
-    let resumeFailureFunction: (_ failure: ResumeFailure) -> Void
+    let resumeFailureFunction: @Sendable (_ failure: ResumeFailure) -> Void
 
     /// Creates a `Continuation`.
     ///
@@ -23,8 +23,8 @@ public class UncheckedContinuation<ResumeValue, ResumeFailure> {
     ///   - value: The arguments to the resume function being executed.
     @inlinable
     public init(
-        onResume resumeFunction: @escaping (_ value: ResumeValue) -> Void,
-        onFailure resumeFailureFunction: @escaping (_ value: ResumeFailure) -> Void
+        onResume resumeFunction: @escaping @Sendable (_ value: ResumeValue) -> Void,
+        onFailure resumeFailureFunction: @escaping @Sendable (_ value: ResumeFailure) -> Void
     ) {
         self.resumeFunction = resumeFunction
         self.resumeFailureFunction = resumeFailureFunction

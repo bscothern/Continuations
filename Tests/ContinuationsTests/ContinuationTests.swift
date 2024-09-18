@@ -24,9 +24,10 @@ final class ContinuationTests: XCTestCase {
     }
 
     func testResume1() {
+        @UnsafeSendableBox
         var wasRun = false
         let c = Continuation<Void, Void> {
-            wasRun = true
+            $wasRun.wrappedValue = true
         } onFailure: {
             XCTFail("Resume failure function shouldn't be called")
         }
@@ -38,10 +39,11 @@ final class ContinuationTests: XCTestCase {
     }
 
     func testResume2() {
+        @UnsafeSendableBox
         var value: Int = 0
         let expected = 42
         let c = Continuation<Int, Void> {
-            value = $0
+            $value.wrappedValue = $0
         } onFailure: {
             XCTFail("Resume failure function shouldn't be called")
         }
@@ -53,9 +55,10 @@ final class ContinuationTests: XCTestCase {
     }
 
     func testMultipleResume() {
+        @UnsafeSendableBox
         var runCount = 0
         let c = Continuation<Void, Void> {
-            runCount += 1
+            $runCount.wrappedValue += 1
         } onFailure: {
             XCTFail("Resume failure function shouldn't be called")
         }
@@ -69,9 +72,10 @@ final class ContinuationTests: XCTestCase {
     }
 
     func testMultipleResumeConcurrent() {
+        @UnsafeSendableBox
         var runCount = 0
         let c = Continuation<Void, Void> {
-            runCount += 1
+            $runCount.wrappedValue += 1
         } onFailure: {
             XCTFail("Resume failure function shouldn't be called")
         }
@@ -79,16 +83,17 @@ final class ContinuationTests: XCTestCase {
         DispatchQueue.concurrentPerform(iterations: 1000) { _ in
             c.resume()
             XCTAssertTrue(c.haveRun.load(ordering: .relaxed))
-            XCTAssertEqual(runCount, 1)
+            XCTAssertEqual($runCount.wrappedValue, 1)
         }
     }
 
     func testResumeFailure1() {
+        @UnsafeSendableBox
         var wasRun = false
         let c = Continuation<Void, Void> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: {
-            wasRun = true
+            $wasRun.wrappedValue = true
         }
         XCTAssertFalse(wasRun)
         XCTAssertFalse(c.haveRun.load(ordering: .relaxed))
@@ -98,12 +103,13 @@ final class ContinuationTests: XCTestCase {
     }
 
     func testResumeFailure2() {
+        @UnsafeSendableBox
         var value: Int = 0
         let expected = 42
         let c = Continuation<Void, Int> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: {
-            value = $0
+            $value.wrappedValue = $0
         }
         XCTAssertEqual(value, 0)
         XCTAssertFalse(c.haveRun.load(ordering: .relaxed))
@@ -113,11 +119,12 @@ final class ContinuationTests: XCTestCase {
     }
 
     func testMultipleResumeFailure() {
+        @UnsafeSendableBox
         var runCount = 0
         let c = Continuation<Void, Void> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: {
-            runCount += 1
+            $runCount.wrappedValue += 1
         }
         XCTAssertEqual(runCount, 0)
         XCTAssertFalse(c.haveRun.load(ordering: .relaxed))
@@ -129,28 +136,30 @@ final class ContinuationTests: XCTestCase {
     }
 
     func testMultipleResumeFailureConcurrent() {
+        @UnsafeSendableBox
         var runCount = 0
         let c = Continuation<Void, Void> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: {
-            runCount += 1
+            $runCount.wrappedValue += 1
         }
         XCTAssertFalse(c.haveRun.load(ordering: .relaxed))
         DispatchQueue.concurrentPerform(iterations: 1000) { _ in
             c.resumeFailure()
             XCTAssertTrue(c.haveRun.load(ordering: .relaxed))
-            XCTAssertEqual(runCount, 1)
+            XCTAssertEqual($runCount.wrappedValue, 1)
         }
     }
 
-    #if TEST_DEPRECATED_WARNINGS
+#if TEST_DEPRECATED_WARNINGS
     func testWarningResumeFailureWhenErrorType() {
         struct E: Error {}
+        @SendableBox
         var wasCalled = false
         let c = Continuation<Void, E> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: { _ in
-            wasCalled = true
+            $wasCalled.wrappedValue = true
         }
         XCTAssertFalse(wasCalled)
         XCTAssertFalse(c.haveRun.load(ordering: .relaxed))
@@ -158,15 +167,16 @@ final class ContinuationTests: XCTestCase {
         XCTAssertTrue(c.haveRun.load(ordering: .relaxed))
         XCTAssertTrue(wasCalled)
     }
-    #endif
+#endif
 
     func testResumeFailureWhenErrorType() {
         struct E: Error {}
+        @UnsafeSendableBox
         var runCount = 0
         let c = Continuation<Void, E> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: { _ in
-            runCount += 1
+            $runCount.wrappedValue += 1
         }
         XCTAssertEqual(runCount, 0)
         func callFunction<T: _TestResumeFailureWhenErrorType>(on c: T) where T.ResumeFailure == E {
@@ -182,11 +192,12 @@ final class ContinuationTests: XCTestCase {
 
     func testResumeThrowing() {
         struct E: Error {}
+        @UnsafeSendableBox
         var runCount = 0
         let c = Continuation<Void, E> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: { _ in
-            runCount += 1
+            $runCount.wrappedValue += 1
         }
         XCTAssertEqual(runCount, 0)
         XCTAssertFalse(c.haveRun.load(ordering: .relaxed))
@@ -199,9 +210,10 @@ final class ContinuationTests: XCTestCase {
 
     func testResumeWithResultSuccess() {
         struct E: Error {}
+        @UnsafeSendableBox
         var runCount = 0
         let c = Continuation<Void, E> {
-            runCount += 1
+            $runCount.wrappedValue += 1
         } onFailure: { _ in
             XCTFail("Resume function shouldn't be called")
         }
@@ -216,11 +228,12 @@ final class ContinuationTests: XCTestCase {
 
     func testResumeWithResultFailure() {
         struct E: Error {}
+        @UnsafeSendableBox
         var runCount = 0
         let c = Continuation<Void, E> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: { _ in
-            runCount += 1
+            $runCount.wrappedValue += 1
         }
         XCTAssertEqual(runCount, 0)
         XCTAssertFalse(c.haveRun.load(ordering: .relaxed))

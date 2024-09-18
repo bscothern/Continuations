@@ -28,9 +28,10 @@ final class UncheckedContinuationTests: XCTestCase {
     }
 
     func testResume1() {
+        @UnsafeSendableBox
         var wasRun = false
         let c = UncheckedContinuation<Void, Void> {
-            wasRun = true
+            $wasRun.wrappedValue = true
         } onFailure: {
             XCTFail("Resume failure function shouldn't be called")
         }
@@ -40,10 +41,11 @@ final class UncheckedContinuationTests: XCTestCase {
     }
 
     func testResume2() {
+        @UnsafeSendableBox
         var value: Int = 0
         let expected = 42
         let c = UncheckedContinuation<Int, Void> {
-            value = $0
+            $value.wrappedValue = $0
         } onFailure: {
             XCTFail("Resume failure function shouldn't be called")
         }
@@ -53,9 +55,10 @@ final class UncheckedContinuationTests: XCTestCase {
     }
 
     func testMultipleResume() {
+        @UnsafeSendableBox
         var runCount = 0
         let c = UncheckedContinuation<Void, Void> {
-            runCount += 1
+            $runCount.wrappedValue += 1
         } onFailure: {
             XCTFail("Resume failure function shouldn't be called")
         }
@@ -67,11 +70,12 @@ final class UncheckedContinuationTests: XCTestCase {
     }
 
     func testResumeFailure1() {
+        @UnsafeSendableBox
         var wasRun = false
         let c = UncheckedContinuation<Void, Void> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: {
-            wasRun = true
+            $wasRun.wrappedValue = true
         }
         XCTAssertFalse(wasRun)
         c.resumeFailure()
@@ -79,12 +83,13 @@ final class UncheckedContinuationTests: XCTestCase {
     }
 
     func testResumeFailure2() {
+        @UnsafeSendableBox
         var value: Int = 0
         let expected = 42
         let c = UncheckedContinuation<Void, Int> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: {
-            value = $0
+            $value.wrappedValue = $0
         }
         XCTAssertEqual(value, 0)
         c.resumeFailure(returning: expected)
@@ -92,11 +97,12 @@ final class UncheckedContinuationTests: XCTestCase {
     }
 
     func testMultipleResumeFailure() {
+        @UnsafeSendableBox
         var runCount = 0
         let c = UncheckedContinuation<Void, Void> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: {
-            runCount += 1
+            $runCount.wrappedValue += 1
         }
         XCTAssertEqual(runCount, 0)
         c.resumeFailure()
@@ -105,28 +111,30 @@ final class UncheckedContinuationTests: XCTestCase {
         XCTAssertEqual(runCount, 2)
     }
 
-    #if TEST_DEPRECATED_WARNINGS
+#if TEST_DEPRECATED_WARNINGS
     func testWarningResumeFailureWhenErrorType() {
         struct E: Error {}
+        @SendableBox
         var wasCalled = false
         let c = UncheckedContinuation<Void, E> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: { _ in
-            wasCalled = true
+            $wasCalled.wrappedValue = true
         }
         XCTAssertFalse(wasCalled)
         c.resumeFailure(returning: E())
         XCTAssertTrue(wasCalled)
     }
-    #endif
+#endif
 
     func testResumeFailureWhenErrorType() {
         struct E: Error {}
+        @UnsafeSendableBox
         var wasCalled = false
         let c = UncheckedContinuation<Void, E> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: { _ in
-            wasCalled = true
+            $wasCalled.wrappedValue = true
         }
         XCTAssertFalse(wasCalled)
         func callFunction<T: _TestResumeFailureWhenErrorType>(on c: T) where T.ResumeFailure == E {
@@ -138,11 +146,12 @@ final class UncheckedContinuationTests: XCTestCase {
 
     func testResumeThrowing() {
         struct E: Error {}
+        @UnsafeSendableBox
         var wasCalled = false
         let c = UncheckedContinuation<Void, E> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: { _ in
-            wasCalled = true
+            $wasCalled.wrappedValue = true
         }
         XCTAssertFalse(wasCalled)
         c.resume(throwing: E())
@@ -151,9 +160,10 @@ final class UncheckedContinuationTests: XCTestCase {
 
     func testResumeWithResultSuccess() {
         struct E: Error {}
+        @UnsafeSendableBox
         var wasCalled = false
         let c = UncheckedContinuation<Void, E> {
-            wasCalled = true
+            $wasCalled.wrappedValue = true
         } onFailure: { _ in
             XCTFail("Resume function shouldn't be called")
         }
@@ -164,11 +174,12 @@ final class UncheckedContinuationTests: XCTestCase {
 
     func testResumeWithResultFailure() {
         struct E: Error {}
+        @UnsafeSendableBox
         var wasCalled = false
         let c = UncheckedContinuation<Void, E> {
             XCTFail("Resume function shouldn't be called")
         } onFailure: { _ in
-            wasCalled = true
+            $wasCalled.wrappedValue = true
         }
         XCTAssertFalse(wasCalled)
         c.resume(with: .failure(E()))

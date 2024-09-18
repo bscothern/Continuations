@@ -3,7 +3,7 @@
 //  Continuations
 //
 //  Created by Braden Scothern on 10/20/20.
-//  Copyright © 2020-2021 Braden Scothern. All rights reserved.
+//  Copyright © 2020-2024 Braden Scothern. All rights reserved.
 //
 
 import Atomics
@@ -14,7 +14,7 @@ import Atomics
 ///
 /// There is also the benefit of it is guaranteed in a thread safe way that a `Continuation` can only be resumed a single time.
 /// If `resume(returning:)` or `resumeFailure(returning:)` or `resume(throwing:)` is called more than once or after the other resume function has been called then nothing will happen in release mode and an assertion will be raised in debug mode.
-public class Continuation<ResumeValue, ResumeFailure>: UncheckedContinuation<ResumeValue, ResumeFailure> {
+public class Continuation<ResumeValue, ResumeFailure>: UncheckedContinuation<ResumeValue, ResumeFailure>, @unchecked Sendable {
     @usableFromInline
     var haveRun: UnsafeAtomic<Bool> = .create(false)
 

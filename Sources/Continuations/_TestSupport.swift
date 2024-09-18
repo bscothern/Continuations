@@ -3,7 +3,7 @@
 //  Continuations
 //
 //  Created by Braden Scothern on 10/20/20.
-//  Copyright © 2020-2021 Braden Scothern. All rights reserved.
+//  Copyright © 2020-2024 Braden Scothern. All rights reserved.
 //
 
 #if DEBUG
@@ -11,12 +11,12 @@
 ///
 /// These flags are used to disable assertions while helping ensure correct behavior for normal use.
 @usableFromInline
-enum _TestSupport {
+enum _TestSupport: @unchecked Sendable {
     @usableFromInline
     static var assertCondition: Bool { !_triggerAssertions }
 
     @usableFromInline
-    static var _triggerAssertions = true
+    nonisolated(unsafe) static var _triggerAssertions = true
 
     static func disableAssertions() {
         _triggerAssertions = false
